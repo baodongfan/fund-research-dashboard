@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FundApiService } from '../../api/fund-api.service';
+import { catchError, finalize, forkJoin, of } from 'rxjs';
 import type { Quote } from '../../models/fund.models';
 
 @Component({
@@ -25,19 +26,18 @@ export class HomeComponent implements OnInit {
   showSearch = signal(false);
 
   ngOnInit() {
-    this.api.getMovers('desc', 10).subscribe(data => {
-      this.moversUp.set(data);
-    });
-    this.api.getMovers('asc', 10).subscribe(data => {
-      this.moversDown.set(data);
-    });
-    this.api.getVolumeTop(10).subscribe(data => {
-      this.volumeTop.set(data);
-    });
-    this.api.getMovers('desc', 10, 'ETF').subscribe(data => {
-      this.etfMovers.set(data);
-      this.loading.set(false);
-    });
+    forkJoin({
+      up: this.api.getMovers('desc', 10).pipe(catchError(() => of([] as Quote[]))),
+      down: this.api.getMovers('asc', 10).pipe(catchError(() => of([] as Quote[]))),
+      volume: this.api.getVolumeTop(10).pipe(catchError(() => of([] as Quote[]))),
+      etf: this.api.getMovers('desc', 10, 'ETF').pipe(catchError(() => of([] as Quote[])))
+    }).pipe(finalize(() => this.loading.set(false)))
+      .subscribe(({ up, down, volume, etf }) => {
+        this.moversUp.set(up);
+        this.moversDown.set(down);
+        this.volumeTop.set(volume);
+        this.etfMovers.set(etf);
+      });
   }
 
   onSearch() {

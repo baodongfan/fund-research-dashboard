@@ -1,43 +1,27 @@
-import express from "express";
-import { config } from "./config.js";
-import { MemoryCache } from "./infrastructure/cache/memory-cache.js";
-import { MengjiaoApiAdapter } from "./infrastructure/adapters/mengjiao.adapter.js";
-import { FundService } from "./application/fund.service.js";
-import { createApiRouter } from "./interfaces/http/routes.js";
+import express from 'express';
+import cors from 'cors';
+import { config } from './config.js';
+import fundRoutes from './interfaces/http/routes.js';
 
 const app = express();
+app.use(cors());
+app.use(express.json());
 
-// CORS
-app.use((_req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", config.cors.origin);
-  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  if (_req.method === "OPTIONS") {
-    res.sendStatus(204);
-    return;
-  }
-  next();
+app.get('/', (_req, res) => {
+  res.json({
+    name: 'fund-research-dashboard-backend',
+    status: 'ok',
+    version: '0.1.0',
+    endpoints: ['/health', '/api/funds', '/api/funds/movers', '/api/funds/volume-top', '/api/funds/compare', '/api/funds/:code']
+  });
 });
 
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok' });
 });
 
-// 依赖注入
-const cache = new MemoryCache(config.cache.ttlMs, config.cache.maxSize);
-const adapter = new MengjiaoApiAdapter(cache);
-const service = new FundService(adapter);
+app.use('/api', fundRoutes);
 
-app.use("/api", createApiRouter(service));
-
-// 全局错误兜底
-app.use((err: any, _req: any, res: any, _next: any) => {
-  console.error("[error]", err);
-  res.status(500).json({ success: false, error: err.message ?? "internal error" });
-});
-
-const port = config.port;
-app.listen(port, () => {
-  console.log(`Fund Research API running on :${port}`);
-  console.log(`Upstream: ${config.userApi.baseUrl}`);
+app.listen(config.port, () => {
+  console.log(`Fund research backend listening on port ${config.port}`);
 });

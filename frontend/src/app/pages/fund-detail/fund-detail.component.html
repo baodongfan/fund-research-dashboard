@@ -14,32 +14,32 @@
     <!-- 基金基本信息 -->
     <div class="fund-header mb-6">
       <div class="flex-1">
-        <h1 class="fund-name">{{ detail()!.name || detail()!.code }}</h1>
+        <h1 class="fund-name">{{ detail()?.name || detail()?.code }}</h1>
         <div class="flex items-center gap-4 mt-2">
-          <span class="mono text-secondary" style="font-size:13px">{{ detail()!.code }}</span>
-          @if (detail()!.profile?.rate) {
-            <span class="text-secondary" style="font-size:12px">管理费率 {{ detail()!.profile!.rate }}%</span>
+          <span class="mono text-secondary" style="font-size:13px">{{ detail()?.code }}</span>
+          @if (profile()?.rate) {
+            <span class="text-secondary" style="font-size:12px">管理费率 {{ profile()?.rate }}%</span>
           }
         </div>
       </div>
       <div class="fund-price-block">
-        @if (detail()!.quote) {
+        @if (quote()) {
           <div class="fund-current mono">
-            {{ detail()!.quote!.current | number:'1.4-4' }}
+            {{ quote()?.current | number:'1.4-4' }}
           </div>
-          <div class="fund-change" [class]="changeClass(detail()!.quote!.changePercent) + ' mt-2'">
-            {{ formatChange(detail()!.quote!.changePercent) }}
+          <div class="fund-change" [class]="changeClass(quote()?.changePercent) + ' mt-2'">
+            {{ formatChange(quote()?.changePercent) }}
           </div>
-          @if (detail()!.quote!.change) {
+          @if (quote()?.change) {
             <div class="text-secondary text-sm mt-1">
-              {{ detail()!.quote!.change! >= 0 ? '+' : '' }}{{ detail()!.quote!.change | number:'1.4-4' }}
+              {{ quote()!.change! >= 0 ? '+' : '' }}{{ quote()?.change | number:'1.4-4' }}
             </div>
           }
         }
-        @if (detail()!.latestNav) {
+        @if (latestNav()) {
           <div class="nav-info mt-3">
             <div class="text-secondary text-xs">单位净值</div>
-            <div class="mono" style="font-size:13px">{{ detail()!.latestNav!.nav | number:'1.4-4' }}</div>
+            <div class="mono" style="font-size:13px">{{ latestNav()?.nav | number:'1.4-4' }}</div>
           </div>
         }
       </div>
@@ -72,32 +72,32 @@
         </div>
 
         <!-- 阶段收益 -->
-        @if (detail()!.profile?.stageReturns) {
+        @if (stageReturns()) {
           <div class="card">
             <div class="card-title-sm mb-4">阶段收益</div>
             <div class="stage-grid">
               <div class="stage-item">
                 <span class="stage-label">近1月</span>
-                <span class="stage-value" [class]="changeClass(detail()!.profile!.stageReturns!.oneMonth)">
-                  {{ formatChange(detail()!.profile!.stageReturns!.oneMonth) }}
+                <span class="stage-value" [class]="changeClass(stageReturns()?.oneMonth)">
+                  {{ formatChange(stageReturns()?.oneMonth) }}
                 </span>
               </div>
               <div class="stage-item">
                 <span class="stage-label">近3月</span>
-                <span class="stage-value" [class]="changeClass(detail()!.profile!.stageReturns!.threeMonth)">
-                  {{ formatChange(detail()!.profile!.stageReturns!.threeMonth) }}
+                <span class="stage-value" [class]="changeClass(stageReturns()?.threeMonth)">
+                  {{ formatChange(stageReturns()?.threeMonth) }}
                 </span>
               </div>
               <div class="stage-item">
                 <span class="stage-label">近6月</span>
-                <span class="stage-value" [class]="changeClass(detail()!.profile!.stageReturns!.sixMonth)">
-                  {{ formatChange(detail()!.profile!.stageReturns!.sixMonth) }}
+                <span class="stage-value" [class]="changeClass(stageReturns()?.sixMonth)">
+                  {{ formatChange(stageReturns()?.sixMonth) }}
                 </span>
               </div>
               <div class="stage-item">
                 <span class="stage-label">近1年</span>
-                <span class="stage-value" [class]="changeClass(detail()!.profile!.stageReturns!.oneYear)">
-                  {{ formatChange(detail()!.profile!.stageReturns!.oneYear) }}
+                <span class="stage-value" [class]="changeClass(stageReturns()?.oneYear)">
+                  {{ formatChange(stageReturns()?.oneYear) }}
                 </span>
               </div>
             </div>
@@ -105,31 +105,31 @@
         }
 
         <!-- 最新资产配置 -->
-        @if (detail()!.profile?.assetAllocation?.length) {
+        @if (assetAllocation().length) {
           <div class="card">
             <div class="card-title-sm mb-4">资产配置</div>
-            @if (detail()!.profile!.assetAllocation![0]) {
+            @if (assetAllocation()[0]) {
               <div class="alloc-bars">
                 <div class="alloc-row">
                   <span class="alloc-label">股票</span>
                   <div class="alloc-bar">
-                    <div class="alloc-fill" style="width:{{ detail()!.profile!.assetAllocation![0].stockRatio }}%;background:#c8302a"></div>
+                    <div class="alloc-fill" style="width:{{ assetAllocation()[0].stockRatio }}%;background:#c8302a"></div>
                   </div>
-                  <span class="mono text-sm">{{ formatRatio(detail()!.profile!.assetAllocation![0].stockRatio) }}</span>
+                  <span class="mono text-sm">{{ formatRatio(assetAllocation()[0].stockRatio) }}</span>
                 </div>
                 <div class="alloc-row">
                   <span class="alloc-label">债券</span>
                   <div class="alloc-bar">
-                    <div class="alloc-fill" style="width:{{ detail()!.profile!.assetAllocation![0].bondRatio }}%;background:#b8860b"></div>
+                    <div class="alloc-fill" style="width:{{ assetAllocation()[0].bondRatio }}%;background:#b8860b"></div>
                   </div>
-                  <span class="mono text-sm">{{ formatRatio(detail()!.profile!.assetAllocation![0].bondRatio) }}</span>
+                  <span class="mono text-sm">{{ formatRatio(assetAllocation()[0].bondRatio) }}</span>
                 </div>
                 <div class="alloc-row">
                   <span class="alloc-label">现金</span>
                   <div class="alloc-bar">
-                    <div class="alloc-fill" style="width:{{ detail()!.profile!.assetAllocation![0].cashRatio }}%;background:#00875a"></div>
+                    <div class="alloc-fill" style="width:{{ assetAllocation()[0].cashRatio }}%;background:#00875a"></div>
                   </div>
-                  <span class="mono text-sm">{{ formatRatio(detail()!.profile!.assetAllocation![0].cashRatio) }}</span>
+                  <span class="mono text-sm">{{ formatRatio(assetAllocation()[0].cashRatio) }}</span>
                 </div>
               </div>
             }
@@ -137,21 +137,21 @@
         }
 
         <!-- 规模信息 -->
-        @if (detail()!.profile?.assetAllocation?.length) {
+        @if (assetAllocation().length) {
           <div class="card">
             <div class="card-title-sm mb-4">规模信息</div>
             <div class="info-list">
               <div class="info-row">
                 <span class="info-label">净资产</span>
-                <span class="info-value mono">{{ formatMoney(detail()!.profile!.assetAllocation![0].netAsset) }}</span>
+                <span class="info-value mono">{{ formatMoney(assetAllocation()[0].netAsset) }}</span>
               </div>
               <div class="info-row">
                 <span class="info-label">最新报告期</span>
-                <span class="info-value">{{ detail()!.profile!.assetAllocation![0].date }}</span>
+                <span class="info-value">{{ assetAllocation()[0].date }}</span>
               </div>
               <div class="info-row">
                 <span class="info-label">起购金额</span>
-                <span class="info-value">{{ detail()!.profile!.minSubscription || 10 }} 元</span>
+                <span class="info-value">{{ profile()?.minSubscription || 10 }} 元</span>
               </div>
             </div>
           </div>
@@ -163,7 +163,7 @@
     @if (activeTab() === 'holdings') {
       <div class="card">
         <div class="card-title-sm mb-4">前十大重仓股（季度披露）</div>
-        @if (detail()!.profile?.holdings?.length) {
+        @if (holdings().length) {
           <div class="table-container">
             <table>
               <thead>
@@ -175,7 +175,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (h of detail()!.profile!.holdings; track h.code; let i = $index) {
+                @for (h of holdings(); track h.code; let i = $index) {
                   <tr>
                     <td class="text-muted">{{ i + 1 }}</td>
                     <td class="mono">{{ h.code }}</td>
@@ -202,7 +202,7 @@
     @if (activeTab() === 'allocation') {
       <div class="card">
         <div class="card-title-sm mb-4">资产配置历史</div>
-        @if (detail()!.profile?.assetAllocation?.length) {
+        @if (assetAllocation().length) {
           <div class="table-container">
             <table>
               <thead>
@@ -215,7 +215,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (a of detail()!.profile!.assetAllocation; track a.date) {
+                @for (a of assetAllocation(); track a.date) {
                   <tr>
                     <td>{{ a.date }}</td>
                     <td class="text-right mono" [class.up]="(a.stockRatio ?? 0) > 50">{{ formatRatio(a.stockRatio) }}</td>
@@ -236,7 +236,7 @@
     <!-- 基金经理 -->
     @if (activeTab() === 'managers') {
       <div class="grid-2 gap-4">
-        @for (mgr of detail()!.profile?.managers ?? []; track mgr.id) {
+        @for (mgr of managers(); track mgr.id) {
           <div class="card manager-card">
             <div class="flex gap-4">
               <div class="mgr-avatar">
@@ -287,7 +287,7 @@
             }
           </div>
         }
-        @if (!detail()!.profile?.managers?.length) {
+        @if (!managers().length) {
           <div class="empty" style="grid-column:1/-1">暂无基金经理信息</div>
         }
       </div>
@@ -297,7 +297,7 @@
     @if (activeTab() === 'performance') {
       <div class="card">
         <div class="card-title-sm mb-4">业绩多维评分</div>
-        @if (detail()!.profile?.performance) {
+        @if (performance()) {
           <div class="table-container">
             <table>
               <thead>
@@ -308,13 +308,13 @@
                 </tr>
               </thead>
               <tbody>
-                @for (cat of detail()!.profile!.performance!.categories; track cat; let i = $index) {
+                @for (cat of performance()!.categories; track cat; let i = $index) {
                   <tr>
                     <td class="font-medium">{{ cat }}</td>
-                    <td class="text-secondary text-sm">{{ detail()!.profile!.performance!.descriptions[i] }}</td>
+                    <td class="text-secondary text-sm">{{ performance()!.descriptions[i] }}</td>
                     <td class="text-right">
-                      @if (detail()!.profile!.performance!.scores[i] != null) {
-                        <span class="mono">{{ detail()!.profile!.performance!.scores[i] }}</span>
+                      @if (performance()!.scores[i] != null) {
+                        <span class="mono">{{ performance()!.scores[i] }}</span>
                       } @else {
                         <span class="text-muted">--</span>
                       }

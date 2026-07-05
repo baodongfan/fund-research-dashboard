@@ -1,10 +1,10 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
 import { FundApiService } from '../../api/fund-api.service';
-import type { FundDetail, Manager } from '../../models/fund.models';
+import { FundDetail, Manager } from '../../models/fund.models';
 
 type Tab = 'overview' | 'holdings' | 'allocation' | 'managers' | 'performance';
 
@@ -30,6 +30,15 @@ export class FundDetailComponent implements OnInit {
     { key: 'managers', label: '基金经理' },
     { key: 'performance', label: '业绩表现' },
   ];
+
+  profile = computed(() => this.detail()?.profile);
+  quote = computed(() => this.detail()?.quote);
+  latestNav = computed(() => this.detail()?.latestNav);
+  assetAllocation = computed(() => this.profile()?.assetAllocation ?? []);
+  stageReturns = computed(() => this.profile()?.stageReturns);
+  holdings = computed(() => this.profile()?.holdings ?? []);
+  managers = computed(() => this.profile()?.managers ?? []);
+  performance = computed(() => this.profile()?.performance);
 
   navChartData: ChartConfiguration<'line'>['data'] = { labels: [], datasets: [] };
   navChartOptions: ChartConfiguration<'line'>['options'] = {
