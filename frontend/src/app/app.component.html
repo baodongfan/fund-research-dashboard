@@ -1,0 +1,233 @@
+<div
+  class="app-shell"
+  [class.theme-dim]="activeTheme() === 'Dim'"
+  [class.density-compact]="activeDensity() === 'Compact'"
+>
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Market Pulse</p>
+      <h1>Financial Dashboard</h1>
+      <p class="subtitle">
+        Aggregated market snapshots with clean metrics and an audit-friendly data flow.
+      </p>
+    </div>
+    <div class="header-meta">
+      <div class="meta-block">
+        <span class="meta-label">Primary symbol</span>
+        <span class="meta-value">AAPL</span>
+      </div>
+      <div class="meta-block">
+        <span class="meta-label">Refresh cadence</span>
+        <span class="meta-value">Daily close</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="toolbar">
+    <div class="toolbar-group">
+      <p class="toolbar-label">Symbol</p>
+      <div class="select-wrap">
+        <select
+          class="select"
+          [value]="activeSymbol()"
+          (change)="selectSymbol(($any($event.target)).value)"
+        >
+          <option *ngFor="let symbol of symbols" [value]="symbol.value">
+            {{ symbol.label }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="toolbar-group">
+      <p class="toolbar-label">Tools</p>
+      <div class="chip-group">
+        <button
+          class="chip"
+          *ngFor="let tool of tools"
+          [class.active]="tool === activeTool()"
+          (click)="selectTool(tool)"
+        >
+          {{ tool }}
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar-group">
+      <p class="toolbar-label">Period</p>
+      <div class="chip-group">
+        <button
+          class="chip"
+          *ngFor="let period of periods"
+          [class.active]="period === activePeriod()"
+          (click)="selectPeriod(period)"
+        >
+          {{ period }}
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar-group">
+      <p class="toolbar-label">Modes</p>
+      <div class="chip-group">
+        <button
+          class="chip"
+          *ngFor="let mode of viewModes"
+          [class.active]="mode === activeView()"
+          (click)="selectViewMode(mode)"
+        >
+          {{ mode }}
+        </button>
+        <button
+          class="chip"
+          *ngFor="let theme of themes"
+          [class.active]="theme === activeTheme()"
+          (click)="selectTheme(theme)"
+        >
+          {{ theme }}
+        </button>
+        <button
+          class="chip"
+          *ngFor="let density of densities"
+          [class.active]="density === activeDensity()"
+          (click)="selectDensity(density)"
+        >
+          {{ density }}
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar-group">
+      <p class="toolbar-label">Widgets</p>
+      <div class="chip-group">
+        <button class="chip" [class.active]="showKpi()" (click)="toggleWidget('kpi')">
+          KPI
+        </button>
+        <button class="chip" [class.active]="showChart()" (click)="toggleWidget('chart')">
+          Trend
+        </button>
+        <button class="chip" [class.active]="showTable()" (click)="toggleWidget('table')">
+          Table
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div class="state" *ngIf="loading()">
+    <span class="loader"></span>
+    <p>Loading market metrics...</p>
+  </div>
+
+  <div class="state error" *ngIf="error() as message">
+    <div>
+      <p>{{ message }}</p>
+      <p class="subtitle">Check your connection or try another symbol.</p>
+    </div>
+    <button class="chip" type="button" (click)="retryLoad()">Retry</button>
+  </div>
+
+  <section class="kpi-grid" *ngIf="showKpi() && summary() as summary">
+    <article class="kpi-card">
+      <p class="kpi-label">Latest close</p>
+      <h2>{{ summary.latest | number: '1.2-2' }}</h2>
+      <span class="kpi-meta">{{ summary.symbol }}</span>
+    </article>
+    <article class="kpi-card">
+      <p class="kpi-label">Daily change</p>
+      <h2>{{ summary.changeAbs | number: '1.2-2' }}</h2>
+      <span class="kpi-meta">{{ summary.changePct | number: '1.2-2' }}%</span>
+    </article>
+    <article class="kpi-card">
+      <p class="kpi-label">Range high</p>
+      <h2>{{ summary.rangeHigh | number: '1.2-2' }}</h2>
+      <span class="kpi-meta">30-day range</span>
+    </article>
+    <article class="kpi-card">
+      <p class="kpi-label">Range low</p>
+      <h2>{{ summary.rangeLow | number: '1.2-2' }}</h2>
+      <span class="kpi-meta">30-day range</span>
+    </article>
+  </section>
+
+  <section class="kpi-grid" *ngIf="showKpi() && !summary() && !loading() && !error()">
+    <article class="panel placeholder">
+      <div>
+        <p class="panel-kicker">No data</p>
+        <h3>Summary unavailable</h3>
+      </div>
+      <p class="subtitle">Try another symbol or refresh the data.</p>
+    </article>
+  </section>
+
+  <section class="main-grid" *ngIf="!loading() && !error() && activeTool() === 'Overview'">
+    <article class="panel chart-panel" *ngIf="showChart()">
+      <div class="panel-header">
+        <div>
+          <p class="panel-kicker">Trend</p>
+          <h3>{{ chartLabel() }}</h3>
+        </div>
+        <span class="tag">{{ activePeriod() }} sessions</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas
+          baseChart
+          [data]="lineChartData"
+          [options]="lineChartOptions"
+          [type]="'line'"
+        ></canvas>
+      </div>
+    </article>
+
+    <article class="panel table-panel" *ngIf="showTable()">
+      <div class="panel-header">
+        <div>
+          <p class="panel-kicker">Leaders</p>
+          <h3>Top movers</h3>
+        </div>
+        <span class="tag">last close</span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Last</th>
+            <th>Change %</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let asset of topAssets()">
+            <td>{{ asset.symbol }}</td>
+            <td>{{ asset.latest | number: '1.2-2' }}</td>
+            <td>{{ asset.changePct | number: '1.2-2' }}%</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="empty-state" *ngIf="topAssets().length === 0">
+        <p>No movers data for the selected period.</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="panel placeholder" *ngIf="!loading() && !error() && activeTool() !== 'Overview'">
+    <div>
+      <p class="panel-kicker">Module</p>
+      <h3>{{ activeTool() }}</h3>
+    </div>
+    <p class="subtitle">
+      This tool will introduce specialized analytics views. Stay tuned for the next
+      iteration.
+    </p>
+  </section>
+
+  <section class="panel placeholder" *ngIf="loading() && activeTool() === 'Overview'">
+    <div>
+      <p class="panel-kicker">Loading</p>
+      <h3>Preparing analytics</h3>
+    </div>
+    <div class="skeleton-grid">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </div>
+  </section>
+</div>

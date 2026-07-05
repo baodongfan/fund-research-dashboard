@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "installCommand": "cd frontend && npm install",
+  "buildCommand": "cd frontend && npm run build",
+  "outputDirectory": "frontend/dist/frontend/browser",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://financial-dashboard-5o14.onrender.com/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

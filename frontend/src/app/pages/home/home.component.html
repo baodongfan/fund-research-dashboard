@@ -1,0 +1,194 @@
+<div class="page">
+  <!-- 顶部标题 -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">基金研究看板</h1>
+      <p class="page-subtitle">实时行情 · 涨跌追踪 · 深度分析</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="search-wrap" style="position:relative">
+        <input
+          type="search"
+          [(ngModel)]="searchQuery"
+          (input)="onSearch()"
+          (keydown.enter)="showSearch.set(true)"
+          placeholder="搜索基金代码或名称…"
+          class="nav-search"
+          style="background:#fff;color:#1a1a1a;border:1px solid #ddd;width:240px;"
+        />
+        @if (showSearch() && searchResults().length > 0) {
+          <div class="search-dropdown">
+            @for (item of searchResults(); track item.symbol) {
+              <a [routerLink]="['/fund', item.symbol]" class="search-item" (click)="selectFund(item.symbol)">
+                <span class="mono">{{ item.symbol }}</span>
+                <span class="text-secondary">{{ item.name }}</span>
+                <span [class]="changeClass(item.changePercent) + ' ml-auto'" style="font-size:12px">
+                  {{ formatChange(item.changePercent) }}
+                </span>
+              </a>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">
+      <span>载入中…</span>
+    </div>
+  } @else {
+    <!-- 概览统计条 -->
+    <div class="stats-bar mb-6">
+      <div class="stat-item">
+        <span class="stat-label">涨幅前</span>
+        <span class="stat-value up">{{ moversUp()[0]?.changePercent | number:'1.2-2' }}%</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-label">跌幅前</span>
+        <span class="stat-value down">{{ moversDown()[0]?.changePercent | number:'1.2-2' }}%</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-label">成交额王</span>
+        <span class="stat-value">{{ volumeTop()[0]?.name || '--' }}</span>
+      </div>
+
+    </div>
+
+    <div class="home-grid">
+      <!-- 涨幅榜 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">涨幅榜</span>
+          <span class="tag tag-etf">TOP 10</span>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>代码</th>
+                <th>名称</th>
+                <th class="text-right">最新净值</th>
+                <th class="text-right">涨跌幅</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of moversUp(); track item.symbol) {
+                <tr [routerLink]="['/fund', item.symbol]" class="cursor-pointer">
+                  <td class="mono">{{ item.symbol }}</td>
+                  <td class="truncate" style="max-width:120px">{{ item.name }}</td>
+                  <td class="text-right mono">{{ item.current | number:'1.3-3' }}</td>
+                  <td class="text-right">
+                    <span class="change-badge up-bg">{{ formatChange(item.changePercent) }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 跌幅榜 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">跌幅榜</span>
+          <span class="tag tag-fund">BOTTOM 10</span>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>代码</th>
+                <th>名称</th>
+                <th class="text-right">最新净值</th>
+                <th class="text-right">涨跌幅</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of moversDown(); track item.symbol) {
+                <tr [routerLink]="['/fund', item.symbol]" class="cursor-pointer">
+                  <td class="mono">{{ item.symbol }}</td>
+                  <td class="truncate" style="max-width:120px">{{ item.name }}</td>
+                  <td class="text-right mono">{{ item.current | number:'1.3-3' }}</td>
+                  <td class="text-right">
+                    <span class="change-badge down-bg">{{ formatChange(item.changePercent) }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ETF 涨跌 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">ETF 动向</span>
+          <span class="tag tag-etf">ETF</span>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>代码</th>
+                <th>名称</th>
+                <th class="text-right">最新价</th>
+                <th class="text-right">涨跌幅</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of etfMovers(); track item.symbol) {
+                <tr [routerLink]="['/fund', item.symbol]" class="cursor-pointer">
+                  <td class="mono">{{ item.symbol }}</td>
+                  <td class="truncate" style="max-width:120px">{{ item.name }}</td>
+                  <td class="text-right mono">{{ item.current | number:'1.3-3' }}</td>
+                  <td class="text-right">
+                    <span class="change-badge" [class]="item.changePercent! >= 0 ? 'up-bg' : 'down-bg'">
+                      {{ formatChange(item.changePercent) }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 成交额榜 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">成交额榜</span>
+          <span class="tag tag-fund">成交额</span>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>代码</th>
+                <th>名称</th>
+                <th class="text-right">成交额</th>
+                <th class="text-right">涨跌幅</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of volumeTop(); track item.symbol) {
+                <tr [routerLink]="['/fund', item.symbol]" class="cursor-pointer">
+                  <td class="mono">{{ item.symbol }}</td>
+                  <td class="truncate" style="max-width:100px">{{ item.name }}</td>
+                  <td class="text-right mono">{{ formatAmount(item.turnover) }}</td>
+                  <td class="text-right">
+                    <span class="change-badge" [class]="item.changePercent! >= 0 ? 'up-bg' : 'down-bg'">
+                      {{ formatChange(item.changePercent) }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  }
+</div>
