@@ -1,7 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import { config } from './config.js';
-import fundRoutes from './interfaces/http/routes.js';
+import { createApiRouter } from './interfaces/http/routes.js';
+import { MengjiaoApiAdapter } from './infrastructure/adapters/mengjiao.adapter.js';
+import { MemoryCache } from './infrastructure/cache/memory-cache.js';
+import { FundService } from './application/fund.service.js';
+
 
 const app = express();
 app.use(cors());
@@ -20,7 +24,12 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.use('/api', fundRoutes);
+const cache = new MemoryCache(config.cache.ttlMs, config.cache.maxSize);
+const adapter = new MengjiaoApiAdapter(cache);
+const service = new FundService(adapter);
+const apiRouter = createApiRouter(service);
+
+app.use('/api', apiRouter);
 
 app.listen(config.port, () => {
   console.log(`Fund research backend listening on port ${config.port}`);
