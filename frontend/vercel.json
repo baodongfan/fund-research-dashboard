@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://apistock.mengjiao.vip/api/$1"
+      "destination": "https://fund-research-dashboard.onrender.com/api/$1"
     }
   ],
   "headers": [
