@@ -42,12 +42,12 @@
     <div class="stats-bar mb-6">
       <div class="stat-item">
         <span class="stat-label">涨幅前</span>
-        <span class="stat-value up">{{ (moversUp()[0].changePercent ?? 0) | number:'1.2-2' }}%</span>
+        <span class="stat-value up">{{ (moversUp()[0]?.changePercent ?? 0) | number:'1.2-2' }}%</span>
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
         <span class="stat-label">跌幅前</span>
-        <span class="stat-value up">{{ (moversUp().length ? moversUp()[0].changePercent : 0) | number:'1.2-2' }}%</span>
+        <span class="stat-value down">{{ (moversDown()[0]?.changePercent ?? 0) | number:'1.2-2' }}%</span>
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">

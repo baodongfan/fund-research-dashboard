@@ -4,8 +4,8 @@
   "outputDirectory": "dist/frontend/browser",
   "rewrites": [
     {
-      "source": "/funds/(.*)",
-      "destination": "https://fund-research-dashboard.onrender.com/api/funds/$1"
+      "source": "/funds/:path*",
+      "destination": "https://fund-research-dashboard.onrender.com/api/funds/:path*"
     },
     {
       "source": "/(.*)",
@@ -14,7 +14,7 @@
   ],
   "headers": [
     {
-      "source": "/funds/(.*)",
+      "source": "/funds/:path*",
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
       ]
