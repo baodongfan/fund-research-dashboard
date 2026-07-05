@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import type { FundDetail, FundWithQuote, Quote } from '../models/fund.models';
 
-const API = '';
+const API = 'https://fund-research-dashboard.onrender.com/api';
 
 type ApiResponse<T> = { success: boolean; data: T; error?: string };
 

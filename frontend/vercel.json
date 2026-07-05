@@ -4,27 +4,13 @@
   "outputDirectory": "dist/frontend/browser",
   "rewrites": [
     {
-      "source": "/funds/:path*",
-      "destination": "https://fund-research-dashboard.onrender.com/api/funds/:path*"
-    },
-    {
-      "source": "/api/:path*",
-      "destination": "https://fund-research-dashboard.onrender.com/api/:path*"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
   "headers": [
     {
-      "source": "/funds/:path*",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
-      ]
-    },
-    {
-      "source": "/api/:path*",
+      "source": "/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
       ]
