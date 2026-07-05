@@ -107,7 +107,7 @@ export class MengjiaoApiAdapter {
       change: item.change,
       changePercent: item.changePercent ?? (
         item.change != null && item.nav != null && item.nav !== 0
-          ? (item.change / (item.nav - item.change)) * 100
+          ? (item.change / item.nav) * 100
           : undefined
       ),
       open: item.open,
